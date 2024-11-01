@@ -1,3 +1,6 @@
 streamlit
+pytz
 pandas
-openpyxl
+smtplib
+ssl
+email
