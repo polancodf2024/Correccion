@@ -111,7 +111,7 @@ if idioma == "Español":
         "¿Qué servicios solicita?",
         ["Verificación de originalidad", "Parafraseo", "Reporte de similitudes", "Revisión de estilo", "Traducción parcial", "Traducción total"]
     )
-    st.error("El archivo que subirás no debe de incluir listado de autores, ni de adscripciones, ni figuras (pero sí los pies de figuras). El archivo no debe ser mayor a 20 MB.")
+    st.error("Sube un archivo sin autores, afiliaciones, bibliografía ni figuras (incluye pies de figura y citas). Tamaño máximo: 20 MB.")
 else:
     st.title("Scientific Publications Review Center")
     nombre_completo = st.text_input("Full name of the author")
@@ -121,7 +121,7 @@ else:
         "What services do you require?",
         ["Originality verification", "Paraphrasing", "Plagiarism report", "Style review"]
     )
-    st.error("The file you upload should not include a list of authors, affiliations, or figures (but should include figure captions). The file size must not exceed 20 MB.")
+    st.error("Upload a file without authors, affiliations, bibliography, or figures (include captions and citations). Max file size: 20 MB.")
 
 # Subida de archivos
 uploaded_file = st.file_uploader("Sube tu archivo .doc o .docx" if idioma == "Español" else "Upload your .doc or .docx file", type=["doc", "docx"])
