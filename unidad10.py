@@ -109,7 +109,7 @@ if idioma == "Español":
     email_confirmacion = st.text_input("Confirma tu correo electrónico")
     servicios_solicitados = st.multiselect(
         "¿Qué servicios solicita?",
-        ["Verificación de originalidad", "Parafraseo", "Reporte de similitudes", "Revisión de estilo", "Traducción parcial", "Traducción total"]
+        ["Verificación de originalidad", "Parafraseo", "Reporte de similitudes", "Revisión de estilo", "Traducción parcial"]
     )
     st.error("Sube un archivo sin autores, afiliaciones, bibliografía ni figuras (incluye pies de figura y citas). Tamaño máximo: 20 MB.")
 else:
@@ -121,7 +121,7 @@ else:
         "What services do you require?",
         ["Originality verification", "Paraphrasing", "Plagiarism report", "Style review"]
     )
-    st.error("Upload a file without authors, affiliations, bibliography, or figures (include captions and citations). Max file size: 20 MB.")
+    st.error("Upload a file without authors, affiliations, bibliography, or figures (include captions and citations). Max file size: {MAX_FILE_SIZE_MB} MB.")
 
 # Subida de archivos
 uploaded_file = st.file_uploader("Sube tu archivo .doc o .docx" if idioma == "Español" else "Upload your .doc or .docx file", type=["doc", "docx"])
