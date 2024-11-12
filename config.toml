@@ -1,10 +1,7 @@
 [server]
-enableXsrfProtection = true  # Protección XSRF para peticiones de usuario
+enableXsrfProtection = true
+maxUploadSize = 20
 
 [client]
-hideMenuItems = true         # Oculta el menú de ajustes
-
-# Establece el límite máximo de tamaño de archivo en MB
-[server]
-maxUploadSize = 20
+hideMenuItems = true
 
