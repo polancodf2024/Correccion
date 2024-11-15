@@ -18,9 +18,9 @@ SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 EMAIL_USER = "abcdf2024dfabc@gmail.com"
 EMAIL_PASSWORD = "hjdd gqaw vvpj hbsy"  # Contraseña de aplicación
-NOTIFICATION_EMAIL = "polanco@unam.mx"  # Correo para recibir los documentos
+NOTIFICATION_EMAIL = "polanco@unam.mx"
 LOG_FILE = "transaction_log.xlsx"
-MAX_FILE_SIZE_MB = 20  # Tamaño máximo permitido en MB
+MAX_FILE_SIZE_MB = 20
 
 # Función para guardar la transacción en el archivo Excel
 def log_transaction(nombre, email, file_name, servicios):
@@ -49,15 +49,14 @@ def send_confirmation(email_usuario, nombre_usuario, servicios, idioma):
     mensaje['To'] = email_usuario
     mensaje['Subject'] = "Confirmación de recepción de documento" if idioma == "Español" else "Document Receipt Confirmation"
     
-    # Cuerpo del mensaje según el idioma
     if idioma == "Español":
         cuerpo = (f"Hola {nombre_usuario},\n\nHemos recibido tu documento y los siguientes servicios solicitados: "
                   f"{', '.join(servicios)}.\nGracias por enviarlo. En los próximos días te escribiremos.\n\n"
-                  f"Atentamente,\nUnidad de Revisión de Artículos Científicos")
+                  f"Atentamente,\nRevisión de Artículos Científicos")
     else:
         cuerpo = (f"Hello {nombre_usuario},\n\nWe have received your document and the requested services are: "
                   f"{', '.join(servicios)}.\nThank you for submitting it. We will contact you in the following days.\n\n"
-                  f"Sincerely,\nScientific Publications Review Center")
+                  f"Sincerely,\nScientific Publications Staff")
     
     mensaje.attach(MIMEText(cuerpo, 'plain'))
 
@@ -67,24 +66,22 @@ def send_confirmation(email_usuario, nombre_usuario, servicios, idioma):
         server.login(EMAIL_USER, EMAIL_PASSWORD)
         server.sendmail(EMAIL_USER, email_usuario, mensaje.as_string())
 
-# Función para enviar el archivo y el registro a la unidad
+# Función para enviar el archivo y el registro al administrador
 def send_files_to_admin(file_data, file_name, servicios):
     mensaje = MIMEMultipart()
     mensaje['From'] = EMAIL_USER
     mensaje['To'] = NOTIFICATION_EMAIL
     mensaje['Subject'] = "Nuevo documento recibido"
 
-    cuerpo = f"Se ha recibido el documento adjunto y el registro de transacciones. Los servicios que solicita son: {', '.join(servicios)}."
+    cuerpo = f"Se ha recibido el documento adjunto y el registro de transacciones. Los servicios solicitados son: {', '.join(servicios)}."
     mensaje.attach(MIMEText(cuerpo, 'plain'))
 
-    # Adjuntar archivo subido
     part = MIMEBase("application", "octet-stream")
     part.set_payload(file_data)
     encoders.encode_base64(part)
     part.add_header("Content-Disposition", f"attachment; filename={file_name}")
     mensaje.attach(part)
 
-    # Adjuntar archivo de log
     with open(LOG_FILE, "rb") as f:
         log_part = MIMEBase("application", "octet-stream")
         log_part.set_payload(f.read())
@@ -103,30 +100,28 @@ st.image("escudo_COLOR.jpg", width=100)
 
 # Contenido en español o inglés según el idioma seleccionado
 if idioma == "Español":
-    st.title("Unidad de Revisión de Artículos Científicos")
+    st.title("Revisión de Artículos Científicos")
     nombre_completo = st.text_input("Nombre completo del autor")
     email = st.text_input("Correo electrónico del autor")
     email_confirmacion = st.text_input("Confirma tu correo electrónico")
+    numero_economico = st.text_input("Número económico del autor")
     servicios_solicitados = st.multiselect(
         "¿Qué servicios solicita?",
-        ["Verificación de originalidad", "Parafraseo", "Reporte de similitudes", "Revisión de estilo", "Traducción parcial"]
+        ["Agradeceré que me escriban; requiero orientación técnica", "Ninguno", "Verificación de originalidad", "Parafraseo", "Reporte de similitudes", "Revisión de estilo", "Traducción parcial"]
     )
-    st.error("Sube un archivo sin autores, afiliaciones, bibliografía ni figuras (incluye pies de figura y citas). Nota: el tamaño máximo del archivo es 20 MB no 200 MB.")
 else:
     st.title("Scientific Publications Review Center")
     nombre_completo = st.text_input("Full name of the author")
     email = st.text_input("Author's email")
     email_confirmacion = st.text_input("Verify your email")
+    numero_economico = st.text_input("Author's economic number")
     servicios_solicitados = st.multiselect(
         "What services do you require?",
-        ["Originality verification", "Paraphrasing", "Plagiarism report", "Style review"]
+        ["I kindly request that you contact me at your earliest convenience.", "None", "Originality verification", "Paraphrasing", "Plagiarism report", "Style review"]
     )
-    st.error("Upload a file without authors, affiliations, bibliography, or figures (include captions and citations). Note: the maximum file size is 20 MB, not 200 MB.")
 
-# Subida de archivos
 uploaded_file = st.file_uploader("Sube tu archivo .doc o .docx" if idioma == "Español" else "Upload your .doc or .docx file", type=["doc", "docx"])
 
-# Verificación de condiciones y envío del archivo
 if st.button("Enviar archivo" if idioma == "Español" else "Submit file"):
     if not nombre_completo:
         st.error("Por favor, ingresa tu nombre completo." if idioma == "Español" else "Please enter your full name.")
@@ -134,29 +129,27 @@ if st.button("Enviar archivo" if idioma == "Español" else "Submit file"):
         st.error("Por favor, ingresa y confirma tu correo electrónico." if idioma == "Español" else "Please enter and confirm your email.")
     elif email != email_confirmacion:
         st.error("Los correos electrónicos no coinciden. Por favor, verifica." if idioma == "Español" else "The email addresses do not match. Please check.")
+    elif not numero_economico:
+        st.error("Por favor, ingresa tu número económico." if idioma == "Español" else "Please enter your economic number.")
     elif uploaded_file is None:
         st.error("Por favor, adjunta un archivo .doc o .docx." if idioma == "Español" else "Please attach a .doc or .docx file.")
     elif len(uploaded_file.getbuffer()) > MAX_FILE_SIZE_MB * 1024 * 1024:
-        st.error(f"El archivo excede el tamaño máximo permitido de {MAX_FILE_SIZE_MB} MB." if idioma == "Español" else f"The file exceeds the maximum allowed size of {MAX_FILE_SIZE_MB} MB.")
+        st.error(f"El archivo excede el tamaño máximo permitido de {MAX_FILE_SIZE_MB} MB.")
     elif not servicios_solicitados:
-        st.error("Por favor, selecciona al menos un servicio." if idioma == "Español" else "Please select at least one service.")
+        st.error("Por favor, selecciona al menos un servicio.")
     else:
-        # Mostrar mensaje de proceso en curso
-        with st.spinner("Enviando archivo, por favor espera..." if idioma == "Español" else "Sending file, please wait..."):
+        with st.spinner("Enviando archivo, por favor espera..."):
             file_data = uploaded_file.getbuffer()
             file_name = uploaded_file.name
 
-            # Guardar la transacción en el archivo Excel
             log_transaction(nombre_completo, email, file_name, servicios_solicitados)
 
-            # Enviar correos
             send_confirmation(email, nombre_completo, servicios_solicitados, idioma)
             send_files_to_admin(file_data, file_name, servicios_solicitados)
 
-            st.success("Archivo subido y correos enviados exitosamente." if idioma == "Español" else "File uploaded and emails sent successfully.")
-            st.success("Gracias por usar este servicio, en breve recibirás una notificación en tu correo electrónico." if idioma == "Español" else "Thank you for using this service. You will receive a notification in your email shortly.")
-            st.error("Cierra la aplicación" if idioma == "Español" else "Close the application")
+            st.success("Archivo subido y correos enviados exitosamente.")
+            st.success("Gracias por usar este servicio.")
+            st.error("Cierra la aplicación")
 
-            # Opcional: mostrar los servicios seleccionados en la confirmación
-            st.write("Servicios solicitados:" if idioma == "Español" else "Requested services:", ", ".join(servicios_solicitados))
+            st.write("Servicios solicitados:", ", ".join(servicios_solicitados))
 
