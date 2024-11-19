@@ -18,6 +18,9 @@ EMAIL_PASSWORD = "hjdd gqaw vvpj hbsy"
 NOTIFICATION_EMAIL = "polanco@unam.mx"
 LOG_FILE = "registro_correccion.csv"
 
+# Selección de idioma
+idioma = st.sidebar.selectbox("Idioma / Language", ["Español", "English"], index=0)
+
 # Función para registrar transacciones en CSV
 def log_transaction(nombre, email, file_name, servicios):
     tz_mexico = pytz.timezone("America/Mexico_City")
@@ -25,9 +28,11 @@ def log_transaction(nombre, email, file_name, servicios):
     data = {
         "Nombre": [nombre],
         "Email": [email],
-        "Fecha y Hora": [fecha_hora],  # Marca de tiempo
+        "Fecha y Hora": [fecha_hora],
         "Nombre del Archivo": [file_name],
-        "Servicios Solicitados": [", ".join(servicios)]
+        "Servicios Solicitados": [", ".join(servicios)],
+        "Estado": ["Activo"],
+        "Fecha Terminación": [""]
     }
     df = pd.DataFrame(data)
 
@@ -64,9 +69,14 @@ def send_files_to_admin(file_data, file_name, servicios):
     mensaje = MIMEMultipart()
     mensaje['From'] = EMAIL_USER
     mensaje['To'] = NOTIFICATION_EMAIL
-    mensaje['Subject'] = "Nuevo documento recibido"
+    mensaje['Subject'] = "Nuevo documento recibido" if idioma == "Español" else "New Document Received"
 
-    cuerpo = f"Se ha recibido el documento adjunto y el registro de transacciones. Los servicios solicitados son: {', '.join(servicios)}."
+    cuerpo = (
+        f"Se ha recibido el documento adjunto y el registro de transacciones. Los servicios solicitados son: "
+        f"{', '.join(servicios)}." if idioma == "Español"
+        else f"The attached document and transaction log have been received. The requested services are: "
+             f"{', '.join(servicios)}."
+    )
     mensaje.attach(MIMEText(cuerpo, 'plain'))
 
     part = MIMEBase("application", "octet-stream")
@@ -75,7 +85,6 @@ def send_files_to_admin(file_data, file_name, servicios):
     part.add_header("Content-Disposition", f"attachment; filename={file_name}")
     mensaje.attach(part)
 
-    # Adjuntar el archivo de registro CSV
     with open(LOG_FILE, "rb") as f:
         log_part = MIMEBase("application", "octet-stream")
         log_part.set_payload(f.read())
@@ -91,35 +100,38 @@ def send_files_to_admin(file_data, file_name, servicios):
 
 # Añadir el logo y el título
 st.image("escudo_COLOR.jpg", width=100)
-st.title("Revisión de Artículos Científicos")
+st.title("Revisión de Artículos Científicos" if idioma == "Español" else "Scientific Article Review")
 
 # Solicitar información del usuario
-nombre_completo = st.text_input("Nombre completo del autor")
-email = st.text_input("Correo electrónico del autor")
-email_confirmacion = st.text_input("Confirma tu correo electrónico")
-numero_economico = st.text_input("Número económico del autor")
+nombre_completo = st.text_input("Nombre completo del autor" if idioma == "Español" else "Author's Full Name")
+email = st.text_input("Correo electrónico del autor" if idioma == "Español" else "Author's Email")
+email_confirmacion = st.text_input("Confirma tu correo electrónico" if idioma == "Español" else "Confirm Your Email")
+numero_economico = st.text_input("Número económico del autor" if idioma == "Español" else "Author's Economic Number")
 
 # Selección de servicios
 servicios_solicitados = st.multiselect(
-    "¿Qué servicios solicita?",
-    ["Verificación de originalidad", "Parafraseo", "Reporte de similitudes", "Revisión de estilo", "Traducción parcial"]
+    "¿Qué servicios solicita?" if idioma == "Español" else "What services do you require?",
+    ["Verificación de originalidad", "Parafraseo", "Reporte de similitudes", "Factor IA", "Revisión de estilo", "Traducción parcial"] if idioma == "Español" else
+    ["Originality Check", "Paraphrasing", "Similarity Report", "AI Factor", "Style Review", "Partial Translation"]
 )
 
 # Subida de archivo
-uploaded_file = st.file_uploader("Sube tu archivo .doc o .docx", type=["doc", "docx"])
+uploaded_file = st.file_uploader(
+    "Sube tu archivo .doc o .docx" if idioma == "Español" else "Upload your .doc or .docx file", type=["doc", "docx"]
+)
 
-if st.button("Enviar archivo"):
+if st.button("Enviar archivo" if idioma == "Español" else "Submit File"):
     if not nombre_completo or not email or not email_confirmacion or email != email_confirmacion or not numero_economico or uploaded_file is None:
-        st.error("Por favor, completa todos los campos correctamente.")
+        st.error("Por favor, completa todos los campos correctamente." if idioma == "Español" else "Please fill out all fields correctly.")
     else:
-        with st.spinner("Enviando archivo, por favor espera..."):
+        with st.spinner("Enviando archivo, por favor espera..." if idioma == "Español" else "Uploading file, please wait..."):
             file_data = uploaded_file.getbuffer()
             file_name = uploaded_file.name
 
             log_transaction(nombre_completo, email, file_name, servicios_solicitados)
 
-            send_confirmation(email, nombre_completo, servicios_solicitados, "Español")
+            send_confirmation(email, nombre_completo, servicios_solicitados, idioma)
             send_files_to_admin(file_data, file_name, servicios_solicitados)
 
-            st.success("Archivo subido y correos enviados exitosamente.")
+            st.success("Archivo subido y correos enviados exitosamente." if idioma == "Español" else "File uploaded and emails sent successfully.")
 
