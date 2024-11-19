@@ -103,10 +103,10 @@ st.image("escudo_COLOR.jpg", width=100)
 st.title("Revisión de Artículos Científicos" if idioma == "Español" else "Scientific Article Review")
 
 # Solicitar información del usuario
-nombre_completo = st.text_input("Nombre completo del autor" if idioma == "Español" else "Author's Full Name")
-email = st.text_input("Correo electrónico del autor" if idioma == "Español" else "Author's Email")
+nombre_completo = st.text_input("Nombre completo del autor" if idioma == "Español" else "Full Name")
+email = st.text_input("Correo electrónico del autor" if idioma == "Español" else "Email")
 email_confirmacion = st.text_input("Confirma tu correo electrónico" if idioma == "Español" else "Confirm Your Email")
-numero_economico = st.text_input("Número económico del autor" if idioma == "Español" else "Author's Economic Number")
+numero_economico = st.text_input("Número económico del autor" if idioma == "Español" else "Id. Number")
 
 # Selección de servicios
 servicios_solicitados = st.multiselect(
