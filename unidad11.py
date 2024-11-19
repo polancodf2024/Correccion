@@ -100,7 +100,7 @@ def send_files_to_admin(file_data, file_name, servicios):
 
 # Añadir el logo y el título
 st.image("escudo_COLOR.jpg", width=100)
-st.title("Revisión de Artículos Científicos" if idioma == "Español" else "Scientific Article Review")
+st.title("Revisión de Artículos Científicos" if idioma == "Español" else "Revisión de Artículos Científicos")
 
 # Solicitar información del usuario
 nombre_completo = st.text_input("Nombre completo del autor" if idioma == "Español" else "Full Name")
