@@ -1,7 +1,30 @@
 [server]
-enableXsrfProtection = true
-maxUploadSize = 20
+# Configuración del servidor
+headless = true  # Ejecutar en modo sin cabeza
+port = 8501  # Puerto por defecto de Streamlit
+enableCORS = false  # Desactivar CORS solo si se encuentra detrás de un proxy seguro
+enableXsrfProtection = true  # Proteger contra ataques CSRF
+cookieSecret = "unasecretomuylargaYseguraParaLasCookies123"  # Generar una clave segura para las cookies
+runOnSave = false  # Desactivar la recarga automática al guardar cambios en el código
+
+[theme]
+# Opcional: Estilo de tema de la aplicación
+base = "light"
+primaryColor = "#4CAF50"  # Color primario de tu aplicación
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F0F0"
+textColor = "#000000"
+
+[global]
+# Desactivar el acceso al menú de depuración y control de ejecución
+disableWatchdogWarning = true
 
 [client]
-hideMenuItems = true
+# Configuración del cliente
+displayEnabled = true  # Activar la visualización del cliente
+
+[logger]
+# Desactivar el nivel de depuración para evitar exposición innecesaria
+level = "error"
+
 
